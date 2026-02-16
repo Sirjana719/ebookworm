@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}{% if edit_mode %}Edit{% else %}Add{% endif %} Book - Admin{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 admin-sidebar">
+                <div class="sidebar-header">
+                    <h5><i class="fas fa-cog"></i> Admin Panel</h5>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('books.admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('books.manage_books') }}">
+                            <i class="fas fa-book"></i> Manage Books
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('books.add_book') }}">
+                            <i class="fas fa-plus-circle"></i> Add New Book
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home"></i> Back to Site
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 admin-content">
+                <div class="admin-header">
+                    <h2>
+                        <i class="fas fa-{% if edit_mode %}edit{% else %}plus{% endif %}"></i>
+                        {% if edit_mode %}Edit{% else %}Add New{% endif %} Book
+                    </h2>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="title" class="form-label">Book Title *</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="title" 
+                                           name="title" 
+                                           value="{% if book %}{{ book.title }}{% endif %}"
+                                           required>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="author" class="form-label">Author *</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="author" 
+                                           name="author" 
+                                           value="{% if book %}{{ book.author }}{% endif %}"
+                                           required>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="category_id" class="form-label">Category *</label>
+                                    <select class="form-select" id="category_id" name="category_id" required>
+                                        <option value="">Select Category</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.id }}" 
+                                                {% if book and book.category_id == category.id %}selected{% endif %}>
+                                            {{ category.category_name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="price" class="form-label">Price (₹) *</label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="price" 
+                                           name="price" 
+                                           step="0.01"
+                                           value="{% if book %}{{ book.price }}{% endif %}"
+                                           required>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="stock" class="form-label">Stock Quantity *</label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="stock" 
+                                           name="stock" 
+                                           value="{% if book %}{{ book.stock }}{% else %}10{% endif %}"
+                                           required>
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" 
+                                              id="description" 
+                                              name="description" 
+                                              rows="4">{% if book %}{{ book.description }}{% endif %}</textarea>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="isbn" class="form-label">ISBN</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="isbn" 
+                                           name="isbn" 
+                                           value="{% if book %}{{ book.isbn }}{% endif %}">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="publisher" class="form-label">Publisher</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="publisher" 
+                                           name="publisher" 
+                                           value="{% if book %}{{ book.publisher }}{% endif %}">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="published_year" class="form-label">Publication Year</label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="published_year" 
+                                           name="published_year" 
+                                           value="{% if book %}{{ book.published_year }}{% endif %}">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="pages" class="form-label">Number of Pages</label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="pages" 
+                                           name="pages" 
+                                           value="{% if book %}{{ book.pages }}{% endif %}">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="image_url" class="form-label">Image URL</label>
+                                    <input type="url" 
+                                           class="form-control" 
+                                           id="image_url" 
+                                           name="image_url" 
+                                           placeholder="https://example.com/image.jpg"
+                                           value="{% if book %}{{ book.image_url }}{% endif %}">
+                                    <small class="text-muted">Leave empty for default image</small>
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save"></i> 
+                                        {% if edit_mode %}Update{% else %}Add{% endif %} Book
+                                    </button>
+                                    <a href="{{ url_for('books.manage_books') }}" class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

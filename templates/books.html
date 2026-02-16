@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Books - E-BookWorm{% endblock %}
+
+{% block content %}
+<section class="books-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                {% if category_name %}
+                    {{ category_name }}
+                {% else %}
+                    All Books
+                {% endif %}
+            </h1>
+            <p class="page-subtitle">Discover your next great read from our collection</p>
+        </div>
+        
+        <!-- Filters and Search -->
+        <div class="filters-section mb-4">
+            <form method="GET" action="{{ url_for('books.all_books') }}" class="row g-3">
+                <div class="col-lg-4 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control" 
+                               name="search" 
+                               placeholder="Search by title, author..."
+                               value="{{ search_query }}">
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <select class="form-select" name="category">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_category == category.id|string %}selected{% endif %}>
+                            {{ category.category_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <select class="form-select" name="sort">
+                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Highest Rated</option>
+                        <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title: A-Z</option>
+                    </select>
+                </div>
+                
+                <div class="col-lg-2 col-md-6">
+                    <button type="submit" class="btn btn-primary-custom w-100">
+                        <i class="fas fa-filter"></i> Apply
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Results Info -->
+        <div class="results-info mb-4">
+            <p class="text-muted">
+                <i class="fas fa-books"></i>
+                Showing <strong>{{ books|length }}</strong> book{% if books|length != 1 %}s{% endif %}
+            </p>
+        </div>
+        
+        <!-- Books Grid -->
+        {% if books %}
+        <div class="row g-4">
+            {% for book in books %}
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                <div class="book-card">
+                    <div class="book-image-wrapper">
+                        <img src="{{ book.image_url }}" alt="{{ book.title }}" class="book-image">
+                        <div class="book-overlay">
+                            <a href="{{ url_for('books.book_detail', book_id=book.id) }}" class="btn btn-sm btn-light mb-2">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            {% if current_user.is_authenticated %}
+                            <form action="{{ url_for('cart.add_to_cart', book_id=book.id) }}" method="POST" class="add-to-cart-form">
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-cart-plus"></i> Add
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        {% if book.stock < 5 %}
+                        <span class="badge bg-danger stock-badge">Low Stock</span>
+                        {% endif %}
+                    </div>
+                    <div class="book-content">
+                        <h6 class="book-title" title="{{ book.title }}">
+                            {{ book.title[:35] }}{% if book.title|length > 35 %}...{% endif %}
+                        </h6>
+                        <p class="book-author">{{ book.author }}</p>
+                        <div class="book-footer">
+                            <span class="book-price">₹{{ book.price }}</span>
+                            <div class="book-rating">
+                                <i class="fas fa-star"></i>
+                                {{ book.rating }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-results text-center py-5">
+            <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
+            <h3>No Books Found</h3>
+            <p class="text-muted">Try adjusting your search or filters</p>
+            <a href="{{ url_for('books.all_books') }}" class="btn btn-primary-custom">
+                <i class="fas fa-redo"></i> Clear Filters
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handle add to cart without page refresh
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart count
+                    const cartBadge = document.querySelector('.cart-badge');
+                    if (cartBadge) {
+                        cartBadge.textContent = data.cart_count;
+                    }
+                    
+                    // Show success message
+                    const button = this.querySelector('button');
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Added';
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-success');
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalHTML;
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-primary');
+                    }, 2000);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+{% endblock %}

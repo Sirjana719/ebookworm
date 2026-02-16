@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}E-BookWorm - Your Digital Library{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Discover Your Next
+                        <span class="highlight">Great Read</span>
+                    </h1>
+                    <p class="hero-description">
+                        Explore thousands of books across programming, academics, fiction, and more. 
+                        Your journey to knowledge starts here.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('books.all_books') }}" class="btn btn-primary-custom btn-lg me-3">
+                            <i class="fas fa-book-open"></i> Browse Books
+                        </a>
+                        {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light btn-lg">
+                            Get Started
+                        </a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="hero-stats mt-4">
+                        <div class="stat-item">
+                            <i class="fas fa-book"></i>
+                            <div>
+                                <strong>1000+</strong>
+                                <span>Books</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <strong>500+</strong>
+                                <span>Readers</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <div>
+                                <strong>4.8</strong>
+                                <span>Rating</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800" alt="Books" class="img-fluid floating">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Explore by Category</h2>
+            <p class="section-subtitle">Find books that match your interests</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for category in categories %}
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <a href="{{ url_for('books.books_by_category', category_id=category.id) }}" class="category-card">
+                    <div class="category-icon">
+                        {% if 'Programming' in category.category_name %}
+                            <i class="fas fa-code"></i>
+                        {% elif 'Academic' in category.category_name %}
+                            <i class="fas fa-graduation-cap"></i>
+                        {% elif 'Fiction' in category.category_name %}
+                            <i class="fas fa-book"></i>
+                        {% elif 'Self-Help' in category.category_name %}
+                            <i class="fas fa-lightbulb"></i>
+                        {% elif 'Business' in category.category_name %}
+                            <i class="fas fa-briefcase"></i>
+                        {% elif 'Competitive' in category.category_name %}
+                            <i class="fas fa-trophy"></i>
+                        {% elif 'Children' in category.category_name %}
+                            <i class="fas fa-child"></i>
+                        {% else %}
+                            <i class="fas fa-book-open"></i>
+                        {% endif %}
+                    </div>
+                    <h5 class="category-name">{{ category.category_name }}</h5>
+                    <p class="category-desc">{{ category.description[:50] }}...</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Books Section -->
+<section class="featured-section">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Latest Arrivals</h2>
+            <p class="section-subtitle">Fresh picks just for you</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for book in featured_books %}
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="book-card">
+                    <div class="book-image-wrapper">
+                        <img src="{{ book.image_url }}" alt="{{ book.title }}" class="book-image">
+                        <div class="book-overlay">
+                            <a href="{{ url_for('books.book_detail', book_id=book.id) }}" class="btn btn-sm btn-light">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </div>
+                    </div>
+                    <div class="book-content">
+                        <h6 class="book-title">{{ book.title[:30] }}{% if book.title|length > 30 %}...{% endif %}</h6>
+                        <p class="book-author">{{ book.author }}</p>
+                        <div class="book-footer">
+                            <span class="book-price">₹{{ book.price }}</span>
+                            <div class="book-rating">
+                                <i class="fas fa-star"></i>
+                                {{ book.rating }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{{ url_for('books.all_books') }}" class="btn btn-primary-custom btn-lg">
+                View All Books <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Top Rated Section -->
+<section class="top-rated-section">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Top Rated Books</h2>
+            <p class="section-subtitle">Reader favorites with highest ratings</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for book in top_books %}
+            <div class="col-lg-3 col-md-6">
+                <div class="top-book-card">
+                    <div class="rank-badge">#{loop.index}</div>
+                    <img src="{{ book.image_url }}" alt="{{ book.title }}" class="top-book-image">
+                    <div class="top-book-content">
+                        <h5>{{ book.title }}</h5>
+                        <p class="text-muted">{{ book.author }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="price">₹{{ book.price }}</span>
+                            <span class="rating">
+                                <i class="fas fa-star text-warning"></i> {{ book.rating }}
+                            </span>
+                        </div>
+                        <a href="{{ url_for('books.book_detail', book_id=book.id) }}" class="btn btn-outline-primary btn-sm mt-2 w-100">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-card">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="cta-title">Ready to Start Reading?</h2>
+                    <p class="cta-text">Join thousands of readers and discover your next favorite book today!</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('books.all_books') }}" class="btn btn-light btn-lg">
+                            Browse Books Now
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">
+                            Sign Up Free
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
