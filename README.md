@@ -305,7 +305,6 @@ This project is created for academic purposes as part of the Web Technology (BIT
 
 ## 👨‍💻 Author
 
-**Your Name**
 - Student ID: LC00017003686
 - Course: BIT Second Year / Third Semester
 - Subject: Web Technology (BIT233)
