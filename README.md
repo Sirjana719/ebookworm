@@ -270,9 +270,6 @@ None at the moment. Please report any issues you find!
 
 ## 📝 Assignment Requirements Met
 
-### Task 1: Theoretical Analysis ✅
-- All theoretical questions covered in documentation
-
 ### Task 2: Website Development ✅
 
 #### A. Planning & Design (20 Marks)
@@ -309,7 +306,7 @@ This project is created for academic purposes as part of the Web Technology (BIT
 ## 👨‍💻 Author
 
 **Your Name**
-- Student ID: [Your LCID]
+- Student ID: LC00017003686
 - Course: BIT Second Year / Third Semester
 - Subject: Web Technology (BIT233)
 - Instructor: Mr. Ashish Gautam
@@ -325,11 +322,4 @@ This project is created for academic purposes as part of the Web Technology (BIT
 ## 📞 Support
 
 For any queries or issues:
-- Email: [Your Email]
-- GitHub Issues: [Repository URL]/issues
-
----
-
-**Made with ❤️ for Web Technology Assignment**
-
-**Project Submission Date:** [Insert Date]
+- Email: shrijanapoudel89@gmail.com
